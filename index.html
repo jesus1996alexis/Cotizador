@@ -1,0 +1,580 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cotizador — Cotiza, cobra y organiza tus trabajos</title>
+<meta name="description" content="App para Android para oficios: cotizaciones en PDF ilimitadas y gratis, sin anuncios y sin internet. Cotizador Pro con firmas, cobros, costos y equipo en un solo pago.">
+<meta property="og:title" content="Cotizador — Cotiza, cobra y organiza tus trabajos">
+<meta property="og:description" content="Cotizaciones ilimitadas gratis, sin anuncios y sin internet. Pro en un solo pago.">
+<meta property="og:image" content="logo.png">
+<link rel="icon" href="logo.png">
+<style>
+  /* Mismos colores de la app: azul marino y ladrillo. */
+  :root {
+    --bg: #111a26;
+    --surface: #1b2a41;
+    --surface-2: #24364f;
+    --line: #2e4058;
+    --field: #0d1520;
+    --text: #f1f4f7;
+    --muted: #a9b4c2;
+    --accent: #dc7a5a;          /* ladrillo claro: texto e íconos sobre azul */
+    --accent-strong: #c2532f;   /* ladrillo: botones */
+    --accent-soft: rgba(194,83,47,.16);
+    --accent-ink: #ffffff;
+    --brand: #c2532f;
+    --warn: #ebd08e;
+    --radius: 16px;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font: 16px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  a { color: inherit; text-decoration: none; }
+  svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 20px; }
+  section { padding: 72px 0; }
+  h1, h2, h3 { line-height: 1.2; margin: 0; }
+  h2 { font-size: clamp(26px, 4vw, 36px); text-align: center; }
+  .lead { color: var(--muted); text-align: center; max-width: 620px; margin: 12px auto 40px; }
+
+  /* ---------- Encabezado ---------- */
+  header.top {
+    position: sticky; top: 0; z-index: 10;
+    background: rgba(17,26,38,.88); backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line);
+  }
+  header.top .wrap { display: flex; align-items: center; gap: 24px; height: 64px; }
+  .logo { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 18px; }
+  .logo img { width: 36px; height: 36px; border-radius: 9px; }
+  header nav { display: flex; gap: 22px; margin-left: auto; color: var(--muted); font-size: 15px; }
+  header nav a:hover { color: var(--text); }
+
+  /* ---------- Botón Google Play ---------- */
+  .play {
+    display: inline-flex; align-items: center; gap: 12px;
+    background: var(--accent-strong); color: var(--accent-ink);
+    padding: 12px 22px; border-radius: 14px; font-weight: 700;
+    transition: transform .15s, box-shadow .15s;
+  }
+  .play:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(194,83,47,.3); }
+  .play svg { width: 28px; height: 28px; fill: var(--accent-ink); stroke: none; }
+  .play small { display: block; font-size: 11px; font-weight: 500; line-height: 1; opacity: .8; }
+  .play b { display: block; font-size: 18px; line-height: 1.15; }
+  .play.sm { padding: 8px 14px; border-radius: 10px; }
+  .play.sm svg { width: 20px; height: 20px; }
+  .play.sm b { font-size: 14px; }
+
+  /* ---------- Portada ---------- */
+  .hero { padding: 64px 0 40px; }
+  .hero .wrap { display: grid; grid-template-columns: 1.1fr .9fr; gap: 48px; align-items: center; }
+  .pill {
+    display: inline-block; font-size: 13px; font-weight: 600; color: var(--accent);
+    background: var(--accent-soft); padding: 5px 12px; border-radius: 999px; margin-bottom: 18px;
+  }
+  .hero h1 { font-size: clamp(34px, 5.5vw, 54px); letter-spacing: -.02em; }
+  .hero h1 em { font-style: normal; color: var(--accent); }
+  .hero p { color: var(--muted); font-size: 18px; margin: 18px 0 28px; max-width: 520px; }
+  .hero .cta { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+  .hero .cta span { color: var(--muted); font-size: 14px; }
+  .checks { display: flex; gap: 18px; flex-wrap: wrap; margin-top: 28px; color: var(--muted); font-size: 14px; }
+  .checks span { display: flex; align-items: center; gap: 6px; }
+  .checks svg { width: 18px; height: 18px; color: var(--accent); }
+
+  /* ---------- Teléfono de muestra ---------- */
+  .phone {
+    width: 290px; margin: 0 auto; background: #0a0f18; border-radius: 40px; padding: 12px;
+    border: 1px solid var(--line); box-shadow: 0 30px 80px rgba(0,0,0,.5), 0 0 0 6px #121a28;
+  }
+  /* Réplica de la pantalla real de Cotizaciones */
+  .screen { background: var(--bg); border-radius: 30px; overflow: hidden; height: 580px; position: relative; font-size: 11px; text-align: left; }
+  .screen svg { width: 14px; height: 14px; }
+  .screen .bar { display: flex; justify-content: space-between; padding: 10px 20px 4px; color: var(--text); font-size: 10px; }
+  .screen .head { padding: 8px 14px 0; }
+  .screen .head b { font-size: 17px; }
+  .screen .head small { display: block; color: var(--muted); font-size: 9.5px; margin: 10px 0 8px; }
+  .screen .search {
+    display: flex; align-items: center; gap: 8px; margin: 0 14px 10px; padding: 8px 10px;
+    background: var(--field); border: 1px solid var(--line); border-radius: 8px; color: var(--muted);
+  }
+  .screen .search svg { color: var(--text); }
+  .screen .chips { display: flex; gap: 5px; padding: 0 14px 10px; overflow: hidden; }
+  .chip {
+    display: inline-flex; align-items: center; gap: 4px; flex: none; white-space: nowrap;
+    padding: 4px 9px; border-radius: 8px; background: var(--field); border: 1px solid var(--line); color: var(--text); font-size: 9.5px;
+  }
+  .chip svg { width: 10px; height: 10px; stroke-width: 3; }
+  .chip.on { background: var(--accent-strong); border-color: var(--accent-strong); color: var(--accent-ink); font-weight: 600; }
+  .q { margin: 0 14px 9px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 11px 11px 10px; }
+  .q .r { display: flex; justify-content: space-between; align-items: center; }
+  .q .folio { display: flex; align-items: center; gap: 6px; color: var(--muted); font-size: 9.5px; margin-bottom: 6px; }
+  .q b { font-size: 12px; display: block; }
+  .q small { color: var(--muted); font-size: 9.5px; }
+  .q .r small { margin-top: 12px; }
+  .q .amt { font-weight: 700; font-size: 12px; margin-top: 10px; }
+  .st { font-size: 8px; font-weight: 700; letter-spacing: .04em; padding: 2px 6px; border-radius: 4px; text-transform: uppercase; }
+  .st.ok { background: rgba(95,207,140,.16); color: #6fd39a; }
+  .st.sent { background: rgba(110,160,240,.16); color: #8db4f5; }
+  .st.draft { background: var(--surface-2); color: var(--muted); }
+  .screen .fab {
+    position: absolute; right: 12px; bottom: 58px; display: flex; align-items: center; gap: 8px;
+    padding: 10px 14px; border-radius: 12px; font-size: 10px; font-weight: 600;
+    background: var(--accent-strong); color: var(--accent-ink); box-shadow: 0 6px 16px rgba(0,0,0,.4);
+  }
+  .screen .nav {
+    position: absolute; left: 0; right: 0; bottom: 0; display: flex; background: var(--surface);
+    padding: 7px 0 9px;
+  }
+  .screen .nav span { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; color: var(--muted); font-size: 9px; }
+  .screen .nav i { display: grid; place-items: center; width: 40px; height: 22px; border-radius: 999px; }
+  .screen .nav span.on { color: var(--text); font-weight: 700; }
+  .screen .nav span.on i { background: var(--accent-strong); color: var(--accent-ink); }
+
+  /* ---------- Funciones ---------- */
+  .features { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .feat { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 22px; }
+  .feat .ico {
+    width: 46px; height: 46px; border-radius: 12px; display: grid; place-items: center;
+    background: var(--accent-soft); color: var(--accent); margin-bottom: 14px;
+  }
+  .feat h3 { font-size: 17px; margin-bottom: 6px; }
+  .feat p { margin: 0; color: var(--muted); font-size: 15px; }
+
+  /* ---------- Pasos ---------- */
+  .alt { background: var(--surface); border-block: 1px solid var(--line); }
+  .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; counter-reset: s; }
+  .step { text-align: center; padding: 0 10px; }
+  .step::before {
+    counter-increment: s; content: counter(s);
+    display: grid; place-items: center; width: 48px; height: 48px; margin: 0 auto 14px;
+    border-radius: 50%; background: var(--accent-strong); color: var(--accent-ink); font-weight: 800; font-size: 20px;
+  }
+  .step h3 { font-size: 18px; margin-bottom: 6px; }
+  .step p { margin: 0; color: var(--muted); }
+
+  /* ---------- Seguridad ---------- */
+  .split { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center; }
+  .split h2 { text-align: left; }
+  .split .lead { text-align: left; margin: 12px 0 0; }
+  .list { display: grid; gap: 12px; }
+  .list div { display: flex; gap: 14px; align-items: flex-start; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 16px; }
+  .list svg { color: var(--accent); margin-top: 2px; }
+  .list b { display: block; }
+  .list span { color: var(--muted); font-size: 15px; }
+
+  /* ---------- Precio ---------- */
+  .price {
+    max-width: 520px; margin: 0 auto; text-align: center; background: var(--surface);
+    border: 1px solid var(--accent); border-radius: 22px; padding: 36px 28px;
+  }
+  .price .big { font-size: 44px; font-weight: 800; color: var(--accent); line-height: 1; }
+  .price ul { list-style: none; padding: 0; margin: 24px 0 28px; text-align: left; display: grid; gap: 10px; }
+  .price li { display: flex; gap: 10px; align-items: center; }
+  .price li svg { width: 20px; height: 20px; color: var(--accent); }
+
+  .pro {
+    display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: .04em; vertical-align: middle;
+    color: var(--accent-ink); background: var(--accent-strong); padding: 2px 8px; border-radius: 999px; margin-left: 6px;
+  }
+  .plans { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; max-width: 900px; margin: 0 auto; }
+  .plans .price { max-width: none; margin: 0; text-align: left; }
+  .plans .price.free { border-color: var(--line); }
+  .plans .big { font-size: 34px; }
+  .plans .price ul { margin: 18px 0 0; }
+  .note { color: var(--muted); text-align: center; max-width: 640px; margin: 24px auto 0; font-size: 15px; }
+  .cta-center { text-align: center; margin-top: 28px; }
+  @media (max-width: 760px) { .plans { grid-template-columns: 1fr; } }
+
+  /* ---------- Preguntas ---------- */
+  .faq { max-width: 760px; margin: 0 auto; display: grid; gap: 10px; }
+  details { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 16px 20px; }
+  summary { cursor: pointer; font-weight: 600; list-style: none; display: flex; justify-content: space-between; gap: 12px; }
+  summary::-webkit-details-marker { display: none; }
+  summary::after { content: "+"; color: var(--accent); font-size: 22px; line-height: 1; }
+  details[open] summary::after { content: "–"; }
+  details p { color: var(--muted); margin: 10px 0 0; }
+
+  /* ---------- Próximamente ---------- */
+  .soon {
+    display: inline-block; font-size: 12px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase;
+    color: var(--warn); background: rgba(235,208,142,.14); padding: 4px 10px; border-radius: 999px;
+  }
+  .center { text-align: center; }
+  .tutorials { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .tut { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+  .tut .thumb {
+    aspect-ratio: 16 / 9; display: grid; place-items: center; position: relative;
+    background: linear-gradient(135deg, var(--surface-2), #3b2a26); color: var(--muted);
+  }
+  .tut .thumb svg { width: 48px; height: 48px; opacity: .5; }
+  .tut .thumb .soon { position: absolute; top: 12px; left: 12px; }
+  .tut .body { padding: 16px 18px 18px; }
+  .tut h3 { font-size: 16px; margin-bottom: 4px; }
+  .tut p { margin: 0; color: var(--muted); font-size: 14px; }
+
+  .socials { display: flex; justify-content: center; gap: 14px; flex-wrap: wrap; }
+  .social {
+    display: flex; align-items: center; gap: 12px; min-width: 200px;
+    background: var(--surface-2); border: 1px solid var(--line); border-radius: 14px;
+    padding: 14px 18px; color: var(--muted); cursor: default;
+  }
+  .social svg { color: var(--accent); }
+  .social b { display: block; color: var(--text); }
+  .social small { font-size: 12px; color: var(--warn); }
+
+  /* ---------- Cierre ---------- */
+  .final { text-align: center; }
+  .final img { width: 84px; height: 84px; border-radius: 20px; margin-bottom: 18px; }
+  .final .play { margin-top: 26px; }
+  footer { border-top: 1px solid var(--line); padding: 28px 0; color: var(--muted); font-size: 14px; }
+  footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+
+  /* ---------- Responsivo ---------- */
+  @media (max-width: 900px) {
+    .hero .wrap, .split { grid-template-columns: 1fr; }
+    .hero { text-align: center; }
+    .hero p { margin-inline: auto; }
+    .hero .cta, .checks { justify-content: center; }
+    .features, .tutorials { grid-template-columns: repeat(2, 1fr); }
+    .split h2, .split .lead { text-align: center; }
+  }
+  @media (max-width: 640px) {
+    header nav { display: none; }
+    header .play { margin-left: auto; }
+    section { padding: 52px 0; }
+    .features, .steps, .tutorials { grid-template-columns: 1fr; }
+    .social { flex: 1 1 100%; }
+    .phone { width: 260px; }
+    .screen { height: 500px; }
+  }
+</style>
+</head>
+<body>
+
+<svg style="display:none" xmlns="http://www.w3.org/2000/svg">
+  <symbol id="i-play" viewBox="0 0 24 24"><path d="M4 2.8v18.4c0 .7.8 1.1 1.4.7l15.4-9.2c.6-.4.6-1.2 0-1.6L5.4 2.1C4.8 1.7 4 2.1 4 2.8z"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></symbol>
+  <symbol id="i-receipt" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></symbol>
+  <symbol id="i-quote" viewBox="0 0 24 24"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M8 13h8M8 17h5"/></symbol>
+  <symbol id="i-calc" viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h8M8 12h.01M12 12h.01M16 12h.01M8 16h.01M12 16h.01M16 16h.01"/></symbol>
+  <symbol id="i-sign" viewBox="0 0 24 24"><path d="M6 3h9l4 4v14H6z"/><path d="M9 17c1.5-2 2.5 1 4-1s2 0 3-1"/></symbol>
+  <symbol id="i-cash" viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="3"/></symbol>
+  <symbol id="i-cal" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></symbol>
+  <symbol id="i-cost" viewBox="0 0 24 24"><path d="M4 19V5M4 19h16"/><path d="M8 15l4-4 3 3 5-6"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2 20c0-3.5 3-6 7-6s7 2.5 7 6M16 4.5a3.5 3.5 0 0 1 0 7M22 20c0-3-2-5-5-5.7"/></symbol>
+  <symbol id="i-order" viewBox="0 0 24 24"><path d="M9 4h6v3H9z"/><path d="M7 5H5v16h14V5h-2"/><path d="M9 12l2 2 4-4"/></symbol>
+  <symbol id="i-report" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 17v-4M12 17V9M16 17v-6"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></symbol>
+  <symbol id="i-wifi" viewBox="0 0 24 24"><path d="M2 2l20 20M8.5 16.5a5 5 0 0 1 7 0M5 13a10 10 0 0 1 5-2.7M19 13a10 10 0 0 0-2-1.5M12 20h.01"/></symbol>
+  <symbol id="i-video" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="3"/><path d="M10 9l5 3-5 3z"/></symbol>
+  <symbol id="i-camera" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><path d="M17.5 6.5h.01"/></symbol>
+  <symbol id="i-chat" viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></symbol>
+  <symbol id="i-music" viewBox="0 0 24 24"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></symbol>
+  <symbol id="i-people" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/></symbol>
+  <symbol id="i-cloud" viewBox="0 0 24 24"><path d="M7 18a5 5 0 0 1-.6-10A6 6 0 0 1 18 9a4.5 4.5 0 0 1-1 9z"/><path d="M12 11v5M9.5 13.5L12 16l2.5-2.5"/></symbol>
+</svg>
+
+<header class="top">
+  <div class="wrap">
+    <a href="#" class="logo"><img src="logo.png" alt="">Cotizador</a>
+    <nav>
+      <a href="#funciones">Funciones</a>
+      <a href="#seguridad">Seguridad</a>
+      <a href="#precio">Precio</a>
+      <a href="#tutoriales">Tutoriales</a>
+      <a href="#proximamente">Próximamente</a>
+      <a href="#preguntas">Preguntas</a>
+      <a href="#redes">Redes</a>
+      <a href="privacidad.html">Privacidad</a>
+    </nav>
+    <a class="play sm play-link" href="#precio">
+      <svg><use href="#i-play"/></svg><b data-published="Descargar">Muy pronto</b>
+    </a>
+  </div>
+</header>
+
+<!-- Portada -->
+<section class="hero">
+  <div class="wrap">
+    <div>
+      <span class="pill">App para Android · Cotizaciones ilimitadas gratis</span>
+      <h1>Cotiza, cobra y organiza tus trabajos <em>desde tu celular</em></h1>
+      <p>Haz cotizaciones profesionales en PDF en minutos, lleva el control de anticipos y saldos, y organiza tu agenda y a tu equipo. Todo en una app que funciona sin internet.</p>
+      <div class="cta">
+        <a class="play play-link" href="#precio">
+          <svg><use href="#i-play"/></svg>
+          <span style="color:inherit;font-size:inherit"><small data-published="Disponible en">Muy pronto en</small><b>Google Play</b></span>
+        </a>
+        <span>Android 10 o superior</span>
+      </div>
+      <div class="checks">
+        <span><svg><use href="#i-check"/></svg>Sin anuncios</span>
+        <span><svg><use href="#i-check"/></svg>Funciona sin internet</span>
+        <span><svg><use href="#i-check"/></svg>Sin suscripción</span>
+      </div>
+    </div>
+
+    <div class="phone" aria-hidden="true">
+      <div class="screen">
+        <div class="bar"><span>9:36</span><span>▾◢ ▮</span></div>
+        <div class="head"><b>Cotizaciones</b><small>Tus propuestas, siempre a la mano.</small></div>
+        <div class="search"><svg><use href="#i-search"/></svg>Buscar trabajo o destinatario</div>
+        <div class="chips">
+          <span class="chip on"><svg><use href="#i-check"/></svg>Todas</span>
+          <span class="chip">Borradores</span><span class="chip">Emitidas</span><span class="chip">Aceptadas</span>
+        </div>
+        <div class="q"><div class="folio">COT-000004 <span class="st ok">Aceptada</span></div>
+          <b>Remodelación de baño</b><small>Laura Méndez</small>
+          <div class="r"><small>2 nov 2026</small><span class="amt">$38,450.00</span></div></div>
+        <div class="q"><div class="folio">COT-000003 <span class="st sent">Emitida</span></div>
+          <b>Impermeabilización de azotea</b><small>Familia Ortiz</small>
+          <div class="r"><small>1 nov 2026</small><span class="amt">$12,980.00</span></div></div>
+        <div class="q"><div class="folio">COT-000002 <span class="st ok">Aceptada</span></div>
+          <b>Instalación de lavabo</b><small>Óscar Ruiz</small>
+          <div class="r"><small>30 oct 2026</small><span class="amt">$3,126.25</span></div></div>
+        <div class="q"><div class="folio">Sin folio <span class="st draft">Borrador</span></div>
+          <b>Piso cerámico 45 m²</b><small>Sin destinatario</small></div>
+        <div class="fab"><svg><use href="#i-plus"/></svg>Nueva cotización</div>
+        <div class="nav">
+          <span class="on"><i><svg><use href="#i-quote"/></svg></i>Cotizaciones</span>
+          <span><i><svg><use href="#i-cash"/></svg></i>Cobros</span>
+          <span><i><svg><use href="#i-receipt"/></svg></i>Costos</span>
+          <span><i><svg><use href="#i-menu"/></svg></i>Más</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Funciones -->
+<section id="funciones">
+  <div class="wrap">
+    <h2>Todo lo que tu negocio necesita</h2>
+    <p class="lead">Pensada para contratistas, técnicos y oficios: desde la primera cotización hasta el último cobro.</p>
+    <div class="features">
+      <div class="feat"><div class="ico"><svg><use href="#i-quote"/></svg></div>
+        <h3>Cotizaciones en PDF</h3><p>Ilimitadas y gratis, con tu logo. Secciones, vigencia y envío por WhatsApp o correo. Con Pro, hasta tres opciones de precio.</p></div>
+      <div class="feat"><div class="ico"><svg><use href="#i-calc"/></svg></div>
+        <h3>Catálogo y calculadoras</h3><p>Conceptos listos para usar y cálculo de metros cuadrados. Con Pro, paquetes por oficio y calculadoras de pintura y recubrimiento.</p></div>
+      <div class="feat"><div class="ico"><svg><use href="#i-sign"/></svg></div>
+        <h3>Firmas del cliente <span class="pro">Pro</span></h3><p>Tu cliente acepta la cotización y firma en tu celular. También los extras y las entregas.</p></div>
+      <div class="feat"><div class="ico"><svg><use href="#i-cash"/></svg></div>
+        <h3>Pagos y saldos</h3><p>Registra lo que te pagan y sabe cuánto te deben. Con Pro, notas de cobro para anticipos y un pago repartido entre varios trabajos.</p></div>
+      <div class="feat"><div class="ico"><svg><use href="#i-cost"/></svg></div>
+        <h3>Costos y utilidad <span class="pro">Pro</span></h3><p>Anota lo que gastas, lo que debes a proveedores y conoce la ganancia de cada trabajo.</p></div>
+      <div class="feat"><div class="ico"><svg><use href="#i-order"/></svg></div>
+        <h3>Órdenes, extras y entregas <span class="pro">Pro</span></h3><p>Instrucciones para tu equipo, trabajos extra firmados sin duplicar ventas y entregas con constancia.</p></div>
+      <div class="feat"><div class="ico"><svg><use href="#i-cal"/></svg></div>
+        <h3>Agenda y recordatorios</h3><p>Citas, visitas y tareas con avisos en tu celular. Con Pro, tareas que se repiten.</p></div>
+      <div class="feat"><div class="ico"><svg><use href="#i-users"/></svg></div>
+        <h3>Tu equipo, con permisos <span class="pro">Pro</span></h3><p>Agrega empleados con su propio PIN. Cada perfil ve solo los trabajos que le asignas.</p></div>
+      <div class="feat"><div class="ico"><svg><use href="#i-report"/></svg></div>
+        <h3>Reportes <span class="pro">Pro</span></h3><p>Ventas, cobranza, utilidad y cortes del periodo, en PDF y para Excel.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- Cómo funciona -->
+<section class="alt">
+  <div class="wrap">
+    <h2>Empieza en 3 pasos</h2>
+    <p class="lead">Sin registros en línea ni tarjeta para probar.</p>
+    <div class="steps">
+      <div class="step"><h3>Descarga la app</h3><p>Instálala gratis desde Google Play en tu celular o tableta Android.</p></div>
+      <div class="step"><h3>Configura tu negocio</h3><p>Pon tu nombre, logo y un PIN. Guarda tu código de recuperación en un lugar seguro.</p></div>
+      <div class="step"><h3>Envía tu primera cotización</h3><p>Usa el catálogo o el asistente, genera el PDF y compártelo con tu cliente.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- Seguridad -->
+<section id="seguridad">
+  <div class="wrap split">
+    <div>
+      <h2>Tus datos son tuyos</h2>
+      <p class="lead">La información de tu negocio se guarda cifrada en tu dispositivo, no en servidores de terceros. Tú decides cuándo y dónde respaldarla.</p>
+      <p class="lead" style="margin-top:14px"><a href="privacidad.html" style="color:var(--accent)">Lee nuestro aviso de privacidad</a></p>
+    </div>
+    <div class="list">
+      <div><svg><use href="#i-wifi"/></svg><p style="margin:0"><b>Funciona sin internet</b><span>Cotiza, cobra y genera PDF en obra aunque no haya señal.</span></p></div>
+      <div><svg><use href="#i-lock"/></svg><p style="margin:0"><b>Cifrada y con PIN</b><span>Base de datos cifrada y acceso con PIN para ti y cada empleado.</span></p></div>
+      <div><svg><use href="#i-cloud"/></svg><p style="margin:0"><b>Respaldo cuando quieras</b><span>Haz una copia cifrada de tu información y guárdala donde quieras, por ejemplo en tu Drive. Siempre gratis.</span></p></div>
+    </div>
+  </div>
+</section>
+
+<!-- Precio -->
+<section id="precio" class="alt">
+  <div class="wrap">
+    <h2>Gratis para siempre. Pro, un solo pago.</h2>
+    <p class="lead">Sin anuncios y sin mensualidades. Prueba todo Pro 14 días al instalar.</p>
+    <div class="plans">
+      <div class="price free">
+        <div class="big">Gratis</div>
+        <p style="color:var(--muted);margin:10px 0 0">Para siempre, sin tarjeta.</p>
+        <ul>
+          <li><svg><use href="#i-check"/></svg>Cotizaciones ilimitadas en PDF con tu logo</li>
+          <li><svg><use href="#i-check"/></svg>Catálogo con conceptos listos y calculadora de m²</li>
+          <li><svg><use href="#i-check"/></svg>Registro de pagos, saldo y recibo</li>
+          <li><svg><use href="#i-check"/></svg>Agenda con avisos y seguimiento</li>
+          <li><svg><use href="#i-check"/></svg>Respaldos y recuperación</li>
+          <li><svg><use href="#i-check"/></svg>Los PDF llevan «Hecho gratis con Cotizador»</li>
+        </ul>
+      </div>
+      <div class="price">
+        <div class="big">Pro</div>
+        <p style="color:var(--muted);margin:10px 0 0">Una compra única en Google Play.</p>
+        <ul>
+          <li><svg><use href="#i-check"/></svg>Firma del cliente en tu celular</li>
+          <li><svg><use href="#i-check"/></svg>Extras, órdenes y entregas firmadas</li>
+          <li><svg><use href="#i-check"/></svg>Notas de cobro para anticipos</li>
+          <li><svg><use href="#i-check"/></svg>Costos y utilidad de cada trabajo</li>
+          <li><svg><use href="#i-check"/></svg>Paquetes por oficio y todas las calculadoras</li>
+          <li><svg><use href="#i-check"/></svg>Empleados con su PIN y reportes</li>
+          <li><svg><use href="#i-check"/></svg>Documentos sin la marca de Cotizador</li>
+        </ul>
+      </div>
+    </div>
+    <p class="note">Al terminar los 14 días sigues con la versión gratis: no se te cobra nada automáticamente y nunca pierdes tu información.</p>
+    <div class="cta-center">
+      <a class="play play-link" href="#precio">
+        <svg><use href="#i-play"/></svg>
+        <span><small data-published="Disponible en">Muy pronto en</small><b>Google Play</b></span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- Tutoriales -->
+<section id="tutoriales">
+  <div class="wrap">
+    <div class="center"><span class="soon">Próximamente</span></div>
+    <h2 style="margin-top:14px">Tutoriales</h2>
+    <p class="lead">Estamos preparando videos cortos para que domines la app paso a paso.</p>
+    <div class="tutorials">
+      <div class="tut"><div class="thumb"><span class="soon">Próximamente</span><svg><use href="#i-video"/></svg></div>
+        <div class="body"><h3>Configura tu negocio</h3><p>Nombre, logo, PIN y código de recuperación.</p></div></div>
+      <div class="tut"><div class="thumb"><span class="soon">Próximamente</span><svg><use href="#i-video"/></svg></div>
+        <div class="body"><h3>Agrega a tu equipo</h3><p>Empleados con su PIN y lo que puede ver cada uno.</p></div></div>
+      <div class="tut"><div class="thumb"><span class="soon">Próximamente</span><svg><use href="#i-video"/></svg></div>
+        <div class="body"><h3>Tu primera cotización</h3><p>Del catálogo al PDF firmado por tu cliente.</p></div></div>
+      <div class="tut"><div class="thumb"><span class="soon">Próximamente</span><svg><use href="#i-video"/></svg></div>
+        <div class="body"><h3>Paquetes y calculadoras</h3><p>Calcula el material por metros, con desperdicio.</p></div></div>
+      <div class="tut"><div class="thumb"><span class="soon">Próximamente</span><svg><use href="#i-video"/></svg></div>
+        <div class="body"><h3>Anticipos y cobros</h3><p>Pide el anticipo, registra lo que te pagan y sabe cuánto te deben.</p></div></div>
+      <div class="tut"><div class="thumb"><span class="soon">Próximamente</span><svg><use href="#i-video"/></svg></div>
+        <div class="body"><h3>Respalda tu información</h3><p>Tu copia en Drive y cómo recuperarla en otro celular.</p></div></div>
+      <div class="tut"><div class="thumb"><span class="soon">Próximamente</span><svg><use href="#i-video"/></svg></div>
+        <div class="body"><h3>Extras y costos</h3><p>Lo que el cliente pide de más, firmado, y cuánto te dejó el trabajo.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- Próximamente: en lo que estamos trabajando -->
+<section id="proximamente" class="alt">
+  <div class="wrap">
+    <div class="center"><span class="soon">Próximamente</span></div>
+    <h2 style="margin-top:14px">En lo que estamos trabajando</h2>
+    <p class="lead">Ideas para próximas versiones, todavía sin fecha. La app seguirá funcionando sin internet: lo que use internet será opcional.</p>
+    <div class="features">
+      <div class="feat"><div class="ico"><svg><use href="#i-cloud"/></svg></div>
+        <h3>Respaldo en Google Drive</h3><p>Guardar tu copia en tu Drive desde la app, sin pasos extra. Hoy ya puedes guardarla ahí a mano.</p></div>
+      <div class="feat"><div class="ico"><svg><use href="#i-sign"/></svg></div>
+        <h3>Aceptación en línea</h3><p>Enviar un enlace para que tu cliente revise y acepte la cotización desde su teléfono.</p></div>
+      <div class="feat"><div class="ico"><svg><use href="#i-report"/></svg></div>
+        <h3>Versión web</h3><p>Consultar tus cotizaciones, cobros y reportes desde la computadora.</p></div>
+    </div>
+    <p class="lead" style="margin:28px auto 0">También estamos evaluando sincronizar el trabajo con tu equipo, recibir pagos en línea y precios de referencia para el catálogo.</p>
+  </div>
+</section>
+
+<!-- Preguntas frecuentes -->
+<section id="preguntas">
+  <div class="wrap">
+    <h2>Preguntas frecuentes</h2>
+    <p class="lead">Si tienes otra duda, escríbenos.</p>
+    <div class="faq">
+      <details><summary>¿Necesito internet para usarla?</summary>
+        <p>No. Cotizaciones, cobros, agenda, PDF y firmas funcionan sin conexión. Solo necesitas internet para descargarla y para comprar Pro en Google Play.</p></details>
+      <details><summary>¿Qué incluye la versión gratis y qué incluye Pro?</summary>
+        <p>Gratis: cotizaciones ilimitadas en PDF con tu logo, catálogo, calculadora de metros cuadrados, registro de pagos y saldos, agenda y respaldos. Pro agrega firmas del cliente, extras, órdenes y entregas, notas de cobro, costos y utilidad, paquetes por oficio, todas las calculadoras, empleados, reportes y documentos sin la marca de Cotizador.</p></details>
+      <details><summary>¿Qué pasa cuando terminan los 14 días?</summary>
+        <p>Sigues usando la versión gratis. No se te cobra nada automáticamente y tu información nunca se bloquea: lo que hiciste con Pro lo sigues viendo.</p></details>
+      <details><summary>¿Tiene anuncios o suscripción?</summary>
+        <p>No. La versión gratis no tiene anuncios y Pro es una compra única, no una mensualidad.</p></details>
+      <details><summary>¿Qué es el código de recuperación y dónde lo guardo?</summary>
+        <p>Es una clave larga que la app te da al configurar tu negocio. Sirve para recuperar el acceso si olvidas tu PIN y para abrir tus copias de seguridad. Cópialo en papel y guárdalo fuera del celular: sin él no se puede recuperar tu información.</p></details>
+      <details><summary>Olvidé mi PIN, ¿qué hago?</summary>
+        <p>En la pantalla de ingreso toca «Olvidé el PIN del dueño», escribe tu código de recuperación y crea un PIN nuevo. Tus datos se conservan.</p></details>
+      <details><summary>¿Cómo comparto una cotización por WhatsApp?</summary>
+        <p>Genera el PDF de la cotización y toca «Compartir». Elige WhatsApp, correo o la app que quieras.</p></details>
+      <details><summary>¿Cuál es la diferencia entre una nota de cobro y registrar dinero?</summary>
+        <p>La nota de cobro es para pedirle al cliente una parte, por ejemplo el anticipo; no registra dinero. «Registrar dinero recibido» es para anotar lo que ya te pagaron, y eso sí baja lo que te deben.</p></details>
+      <details><summary>El cliente pidió algo de más, ¿cómo lo agrego?</summary>
+        <p>Con Pro, dentro del trabajo usa «Nuevo extra o cambio». El cliente lo firma y el total del trabajo se actualiza sin rehacer la cotización.</p></details>
+      <details><summary>¿Qué pasa si pierdo o cambio de celular?</summary>
+        <p>Con tu archivo de respaldo y tu código de recuperación puedes recuperar tu información en otro dispositivo. Guarda la copia fuera del celular, por ejemplo en tu Drive o tu computadora.</p></details>
+      <details><summary>¿Puedo poner mi logo en las cotizaciones?</summary>
+        <p>Sí. Configuras nombre, teléfono, correo y logo; se aplican a todos tus documentos nuevos.</p></details>
+      <details><summary>¿Puedo usarla con mis empleados?</summary>
+        <p>Sí, con Pro. Cada empleado entra con su propio PIN y un perfil (Encargado o Trabajador) que define qué puede ver y hacer.</p></details>
+      <details><summary>¿Funciona en iPhone?</summary>
+        <p>Por ahora solo está disponible para Android 10 o superior, en celulares y tabletas.</p></details>
+    </div>
+  </div>
+</section>
+
+<!-- Redes sociales -->
+<section id="redes" class="alt">
+  <div class="wrap">
+    <div class="center"><span class="soon">Próximamente</span></div>
+    <h2 style="margin-top:14px">Síguenos en redes</h2>
+    <p class="lead">Pronto compartiremos consejos, novedades y trucos para tu negocio.</p>
+    <div class="socials">
+      <div class="social"><svg><use href="#i-people"/></svg><span><b>Facebook</b><small>Próximamente</small></span></div>
+      <div class="social"><svg><use href="#i-camera"/></svg><span><b>Instagram</b><small>Próximamente</small></span></div>
+      <div class="social"><svg><use href="#i-music"/></svg><span><b>TikTok</b><small>Próximamente</small></span></div>
+      <div class="social"><svg><use href="#i-video"/></svg><span><b>YouTube</b><small>Próximamente</small></span></div>
+      <div class="social"><svg><use href="#i-chat"/></svg><span><b>WhatsApp</b><small>Próximamente</small></span></div>
+    </div>
+  </div>
+</section>
+
+<!-- Llamado final -->
+<section class="final">
+  <div class="wrap">
+    <img src="logo.png" alt="Logo de Cotizador">
+    <h2>Haz tu primera cotización hoy</h2>
+    <p class="lead" style="margin-bottom:0">Cotizaciones ilimitadas gratis y 14 días para probar todo Pro.</p>
+    <a class="play play-link" href="#precio">
+      <svg><use href="#i-play"/></svg>
+      <span><small data-published="Disponible en">Muy pronto en</small><b>Google Play</b></span>
+    </a>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span>© <span id="year"></span> Cotizador. Todos los derechos reservados.</span>
+    <span><a href="privacidad.html">Aviso de privacidad</a> · <a href="mailto:cotizadorappoficios@gmail.com">cotizadorappoficios@gmail.com</a></span>
+  </div>
+</footer>
+
+<script>
+  // Cambia PUBLISHED a true cuando la app esté en Google Play; antes, los botones dicen «Muy pronto» y llevan a los planes.
+  const PUBLISHED = false;
+  const PLAY_URL = "https://play.google.com/store/apps/details?id=com.cotizador.app";
+  if (PUBLISHED) {
+    document.querySelectorAll(".play-link").forEach(a => { a.href = PLAY_URL; a.target = "_blank"; a.rel = "noopener"; });
+    document.querySelectorAll("[data-published]").forEach(e => e.textContent = e.dataset.published);
+  }
+  document.getElementById("year").textContent = new Date().getFullYear();
+</script>
+</body>
+</html>
