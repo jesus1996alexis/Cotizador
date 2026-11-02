@@ -224,6 +224,9 @@
   .social svg { color: var(--accent); }
   .social b { display: block; color: var(--text); }
   .social small { font-size: 12px; color: var(--warn); }
+  .social.live { cursor: pointer; border-color: var(--accent-strong); }
+  .social.live small { color: var(--accent); }
+  .social.live:hover { background: var(--surface); }
 
   /* ---------- Cierre ---------- */
   .final { text-align: center; }
@@ -456,7 +459,7 @@
   <div class="wrap">
     <div class="center"><span class="soon">Próximamente</span></div>
     <h2 style="margin-top:14px">Tutoriales</h2>
-    <p class="lead">Estamos preparando videos cortos para que domines la app paso a paso.</p>
+    <p class="lead">Estamos preparando videos cortos para que domines la app paso a paso. Los publicaremos en <a href="https://www.youtube.com/@Cotizador123" target="_blank" rel="noopener" style="color:var(--accent)">nuestro canal de YouTube</a>.</p>
     <div class="tutorials">
       <div class="tut"><div class="thumb"><span class="soon">Próximamente</span><svg><use href="#i-video"/></svg></div>
         <div class="body"><h3>Configura tu negocio</h3><p>Nombre, logo, PIN y código de recuperación.</p></div></div>
@@ -533,14 +536,13 @@
 <!-- Redes sociales -->
 <section id="redes" class="alt">
   <div class="wrap">
-    <div class="center"><span class="soon">Próximamente</span></div>
-    <h2 style="margin-top:14px">Síguenos en redes</h2>
-    <p class="lead">Pronto compartiremos consejos, novedades y trucos para tu negocio.</p>
+    <h2>Síguenos en redes</h2>
+    <p class="lead">Tutoriales, consejos y novedades para tu negocio. Ya estamos en YouTube; las demás redes vienen pronto.</p>
     <div class="socials">
       <div class="social"><svg><use href="#i-people"/></svg><span><b>Facebook</b><small>Próximamente</small></span></div>
       <div class="social"><svg><use href="#i-camera"/></svg><span><b>Instagram</b><small>Próximamente</small></span></div>
       <div class="social"><svg><use href="#i-music"/></svg><span><b>TikTok</b><small>Próximamente</small></span></div>
-      <div class="social"><svg><use href="#i-video"/></svg><span><b>YouTube</b><small>Próximamente</small></span></div>
+      <a class="social live" href="https://www.youtube.com/@Cotizador123" target="_blank" rel="noopener"><svg><use href="#i-video"/></svg><span><b>YouTube</b><small>@Cotizador123</small></span></a>
       <div class="social"><svg><use href="#i-chat"/></svg><span><b>WhatsApp</b><small>Próximamente</small></span></div>
     </div>
   </div>
@@ -562,7 +564,7 @@
 <footer>
   <div class="wrap">
     <span>© <span id="year"></span> Cotizador. Todos los derechos reservados.</span>
-    <span><a href="privacidad.html">Aviso de privacidad</a> · <a href="mailto:cotizadorappoficios@gmail.com">cotizadorappoficios@gmail.com</a></span>
+    <span><a href="https://www.youtube.com/@Cotizador123" target="_blank" rel="noopener">YouTube</a> · <a href="privacidad.html">Aviso de privacidad</a> · <a href="mailto:cotizadorappoficios@gmail.com">cotizadorappoficios@gmail.com</a></span>
   </div>
 </footer>
 
